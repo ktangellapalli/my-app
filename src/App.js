@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Welcome from './welcome';
-import axios from 'axios';
+import UsersLists from './userslist';
+import {connect} from "react-redux";
+import {fetchUserData } from "./actions"
 
 class LoginText extends Component {
   render(){
@@ -10,27 +12,6 @@ class LoginText extends Component {
   }
 }
 
-class UsersLists extends Component {
-  constructor(props){
-    super(props)
-    console.log(this.props)
-  }
-
-  render(){
-    var self = this;
-      return (<tbody>
-        { Object.keys(self.props.users).map((key) => (
-        <tr key={ self.props.users[key].id }>
-          <td>{self.props.users[key].first_name}</td>
-          <td>{self.props.users[key].last_name}</td>
-          <td>{self.props.users[key].email}</td>
-          <td>{self.props.users[key].gender}</td>
-        </tr>
-        ))
-        }
-        </tbody>);
-  }
-}
 
 class App extends Component {
   constructor(props){
@@ -44,21 +25,21 @@ class App extends Component {
     this.handleToggle = this.handleToggle.bind(this);
   }
   componentDidMount(){
-    axios.get('/users.json').then(response => {
-      this.setState({
-        users: response.data
-      })
-    })
   }
   handleToggle(){
     this.setState( prevState => ({
       isLogged: !prevState.isLogged
     }));
   }
+  componentWillReceiveProps(nextprops){
+    this.setState({
+      users: nextprops.users
+    })
+  }
   render() {
     let loggedIn = null;
     if(this.state.isLogged){
-      loggedIn = <Welcome greetingName={this.state.welcomeName}/>
+      loggedIn = <Welcome greetingName={this.props.match.params.number}/>
     } else {
       loggedIn = <LoginText />
     }
@@ -75,6 +56,7 @@ class App extends Component {
           {loggedIn}  
           <button onClick={this.handleToggle}>{this.state.isLogged ? "Logout" : "Login"}</button>        
         </header>
+        <button onClick={this.props.fetchUserData}>Fetch Data</button>
         <table className="table-center">
             <thead>
               <tr>
@@ -91,5 +73,11 @@ class App extends Component {
   }
 
 }
+function mapStateToProps(state) {
+  return {
+      users: state.users[0]
+  };
+}
 
-export default App;
+
+export default connect(mapStateToProps,{fetchUserData})(App);
