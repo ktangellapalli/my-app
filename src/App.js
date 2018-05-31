@@ -4,7 +4,8 @@ import './App.css';
 import Welcome from './welcome';
 import UsersLists from './userslist';
 import {connect} from "react-redux";
-import {fetchUserData } from "./actions"
+import {fetchUserData, selectUser } from "./actions"
+import { Link } from 'react-router-dom';
 
 class LoginText extends Component {
   render(){
@@ -25,6 +26,11 @@ class App extends Component {
     this.handleToggle = this.handleToggle.bind(this);
   }
   componentDidMount(){
+    if(this.props.users && (this.props.users.length > 0)) {
+      this.setState({
+        users: this.props.users
+      })
+    }
   }
   handleToggle(){
     this.setState( prevState => ({
@@ -34,6 +40,11 @@ class App extends Component {
   componentWillReceiveProps(nextprops){
     this.setState({
       users: nextprops.users
+    })
+  }
+  componentWillUnmount(){
+    this.setState({
+      users: []
     })
   }
   render() {
@@ -57,6 +68,7 @@ class App extends Component {
           <button onClick={this.handleToggle}>{this.state.isLogged ? "Logout" : "Login"}</button>        
         </header>
         <button onClick={this.props.fetchUserData}>Fetch Data</button>
+        <Link to="/">Back</Link>
         <table className="table-center">
             <thead>
               <tr>
@@ -80,4 +92,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps,{fetchUserData})(App);
+export default connect(mapStateToProps,{fetchUserData,selectUser})(App);

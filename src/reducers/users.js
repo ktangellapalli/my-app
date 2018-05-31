@@ -5,6 +5,12 @@ const users = (state = [], action) => {
           ...state,
           action.payload
         ]
+      
+      case 'USER_SELECTED':
+          return [
+            ...state,
+            action.payload
+          ]
       default:
         return state
     }
